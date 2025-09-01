@@ -9,8 +9,8 @@ org 0x7c00
     mov di, 2080
     call print
 
-    mov al, 1
-    mov bl, 2
+    mov al, 8
+    mov bl, 5
     call sum
 
     add al, '0'      
