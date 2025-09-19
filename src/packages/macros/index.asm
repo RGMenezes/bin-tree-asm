@@ -1,0 +1,5 @@
+%include "packages/macros/var.asm"
+%include "packages/macros/math.asm"
+%include "packages/macros/print.asm"
+%include "packages/macros/println.asm"
+%include "packages/macros/node.asm"

@@ -1,22 +1,24 @@
 BITS 16
 
-%include "pacotes/macros/index.asm"
+%include "packages/macros/index.asm"
 
 start:
-	print msg_ola
+    println int, no1_val
+    println int, no2_val
+    println int, int_teste
+    print string, msg_teste
+    println string, msg_teste
+    println string, msg_teste
 
 	jmp $
 
+    node no1, 10
+    node no2, 20
 
-    var string, msg_ola, "Ola, mundo!"
-    var string, msg_soma, "A soma de 10 e 20 e: "
-    var string, msg_sub, "A subtracao de 30 e 15 e: "
+    var string, msg_teste, "Apenas uma mensagem de teste."
+    var int, int_teste, 43
 
-    var int, num_a, 10
-    var int, num_b, 20
-    var int, resultado, 0
-
-%include "pacotes/functions/index.asm"
+%include "packages/functions/index.asm"
 
 times 510-($-$$) db 0
 dw 0xAA55

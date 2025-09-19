@@ -1,4 +1,4 @@
-print_string:
+printString:
     mov ah, 0x0E        
     
 .repeat:
