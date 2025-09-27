@@ -27,17 +27,19 @@ start:
     mov [heap_ptr], ax
 
     ; --- demo insert ---
-    mov ax, 10
-    call insert
     mov ax, 5
+    call insert
+    mov ax, 10
     call insert
     mov ax, 15
     call insert
     mov ax, 12
     call insert
+    mov ax, 8
+    call insert
 
     ; --- demo delete 5 ---
-    mov ax, 5
+    mov ax, 10
     call delete
 
     ; --- print in-order ---
@@ -118,18 +120,19 @@ done_insert:
     ret
 
 ; ---------------------------
-; delete AX from BST (simplified)
+; delete AX from BST (recursive, deletes node and all children)
 ; ---------------------------
 delete:
-    push ax
+    push ax          ; save value to delete
     cmp word [root], 0
-    je d_done
-    mov bx, [root]    ; current node
-    xor cx, cx        ; parent
+    je d_done        ; empty tree
+
+    mov bx, [root]   ; start at root
+    xor cx, cx       ; parent = 0
 
 find_node:
     cmp bx, 0
-    je d_done
+    je d_done        ; not found
     mov dx, [bx+NODE_VALUE]
     cmp ax, dx
     je found_node
@@ -144,46 +147,62 @@ go_left_d:
     jmp find_node
 
 found_node:
-    ; BX = node to delete
-    ; CX = parent
-    ; delete children first recursively
+    ; BX = node to delete, CX = parent
+    push bx          ; save current node
+    push cx          ; save parent
+
+    ; recursively delete left child
     mov si, [bx+NODE_LEFT]
     cmp si, 0
-    je skip_left
-    mov ax, si
+    je skip_left_done
+    mov ax, [si+NODE_VALUE]  ; pass value of left child
     call delete
-skip_left:
+skip_left_done:
+
+    ; recursively delete right child
     mov si, [bx+NODE_RIGHT]
     cmp si, 0
-    je skip_right
-    mov ax, si
+    je skip_right_done
+    mov ax, [si+NODE_VALUE]  ; pass value of right child
     call delete
-skip_right:
-    ; now unlink this node
-    mov si, bx    ; SI = node
-    mov bx, cx    ; BX = parent
-    call unlink_node
-    jmp d_done
+skip_right_done:
 
+    ; now unlink this node itself
+    pop cx           ; restore parent
+    pop si           ; restore node
+    mov bx, cx
+    call unlink_node
+
+d_done:
+    pop ax
+    ret
+
+; ---------------------------
+; unlink node from parent
+; input: SI = node, BX = parent
+; ---------------------------
 unlink_node:
     cmp bx, 0
     je unlink_root
-    mov ax, [bx+NODE_LEFT]
-    cmp ax, si
+
+    mov dx, [bx+NODE_LEFT]
+    cmp dx, si
     je unlink_left
-    mov word [bx+NODE_RIGHT], 0
-    ret
+    mov dx, [bx+NODE_RIGHT]
+    cmp dx, si
+    je unlink_right
+    ret  ; should never happen
 
 unlink_left:
     mov word [bx+NODE_LEFT], 0
     ret
 
-unlink_root:
-    mov word [root], 0
+unlink_right:
+    mov word [bx+NODE_RIGHT], 0
     ret
 
-d_done:
-    pop ax
+unlink_root:
+    mov word [root], 0
     ret
 
 ; ---------------------------
